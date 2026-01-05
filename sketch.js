@@ -34,7 +34,7 @@ function draw() {
     //sizes
     const secLen = TWO_PI * 0.16;
     const hmLen = (TWO_PI - secLen) / 2;
-    const gap = 0.002;
+    const gap = 0.004;//gap
     const bottom = HALF_PI;
     //chain layout
     const secStart = bottom + secLen / 2; //left-bottom boundary
@@ -58,6 +58,8 @@ function draw() {
 
     //draw full segment
     function drawSegmentWithProgress(aStart, aEnd, p, r, w, brightHex, brightAlpha, darkHex, darkAlpha) {
+        // dark base
+        strokeCap(SQUARE);
         stroke(darkHex);
         strokeWeight(w);
         drawingContext.globalAlpha = darkAlpha / 255;
@@ -65,13 +67,33 @@ function draw() {
         drawingContext.globalAlpha = 1;
 
         // bright progress
-        const len = aStart - aEnd;//positive
-        const aCur = aStart - len * p;//leadingedge
+        const len = aStart - aEnd;
+        const aCur = aStart - len * p;
+
+        strokeCap(SQUARE);
         stroke(brightHex);
         strokeWeight(w);
-        drawingContext.globalAlpha = brightAlpha / 255;
-        arc(0, 0, r * 2, r * 2, aCur, aStart, OPEN);
         drawingContext.globalAlpha = 1;
+        arc(0, 0, r * 2, r * 2, aCur, aStart, OPEN);
+
+        // cap
+        const x = Math.cos(aCur) * r;
+        const y = Math.sin(aCur) * r;
+        noStroke();
+        fill(brightHex);
+        drawingContext.globalAlpha = 1;
+
+        const headArcLen = Math.abs(aStart - aCur) * r;
+        if (headArcLen < w * 0.5) {
+        const dir = aCur - HALF_PI;
+        arc(x, y, w, w, dir - HALF_PI, dir + HALF_PI, PIE);
+        } else {
+        circle(x, y, w);
+        }
+
+        // restore
+        drawingContext.globalAlpha = 1;
+        noFill();
     }
 
 
@@ -79,9 +101,9 @@ function draw() {
     const MIN_DARK = "#A4DFEF";
     const HOUR_DARK = "#A4B9EF";
     // seconds
-    drawSegmentWithProgress(secA0, secA1, secP, R, thick, "#26D9A6", 235, SEC_DARK, 140);
+    drawSegmentWithProgress(secA0, secA1, secP, R, thick, "#26D9A6", 235, SEC_DARK, 100);
     // minutes
-    drawSegmentWithProgress(minA0, minA1, minP, R, thick, "#26B2D9", 230, MIN_DARK, 140);
+    drawSegmentWithProgress(minA0, minA1, minP, R, thick, "#26B2D9", 230, MIN_DARK, 100);
     // hours
-    drawSegmentWithProgress(hourA0, hourA1, hourP, R, thick, "#2659D9", 225, HOUR_DARK, 140);
+    drawSegmentWithProgress(hourA0, hourA1, hourP, R, thick, "#2659D9", 225, HOUR_DARK, 100);
 }
